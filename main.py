@@ -5,10 +5,13 @@ from typing import Optional
 import torch
 
 from config import Config
-from model.vae import VAE
+from model.vae_cnn import VAE
 from utils.dataset import get_mnist_loaders
-from utils.train import train
-from utils.visualize import save_recon_grid, save_samples
+from utils.dataset import get_ImageNet_loaders
+from utils.dataset import MusicImageDataset
+from utils.train_cnn import train
+from utils.visualize import save_history_curves, save_recon_grid, save_samples
+
 
 
 def parse_args() -> argparse.Namespace:
@@ -58,12 +61,11 @@ def main() -> None:
     config = apply_overrides(Config(), args)
     device = select_device(args.device)
 
-    train_loader, test_loader = get_mnist_loaders(
+    train_loader, test_loader = get_ImageNet_loaders(
         data_dir=str(config.data_dir),
         batch_size=config.batch_size,
         test_batch_size=config.test_batch_size,
         num_workers=config.num_workers,
-        download=config.download,
     )
 
     model = VAE(config.z_dim)
@@ -88,9 +90,18 @@ def main() -> None:
     sample_path = config.output_dir / config.sample_filename
     save_samples(model, history, device, str(sample_path), label=args.label)
 
+    history_path = config.output_dir / "history.png"
+    save_history_curves(history, str(history_path))
+
     model_path = config.output_dir / "vae.pt"
     torch.save(model.state_dict(), model_path)
     print(f"Model checkpoint saved to {model_path}")
+
+    save_history_curves(
+    history,
+    str(config.output_dir / "metrics.png"),
+    metrics=("train_loss", "val_loss", "train_acc", "val_acc"),
+)
 
 
 if __name__ == "__main__":

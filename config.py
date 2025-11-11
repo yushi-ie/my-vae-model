@@ -7,7 +7,7 @@ class Config:
     z_dim: int = 20
     batch_size: int = 128
     test_batch_size: int = 128
-    epochs: int = 30
+    epochs: int = 50
     learning_rate: float = 1e-3
     step_size: int = 15
     gamma: float = 0.1

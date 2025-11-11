@@ -53,8 +53,6 @@ def train(
     history: History = {
         "train_loss": [],
         "val_loss": [],
-        "z1": [],
-        "z2": [],
         "mu1": [],
         "mu2": [],
         "logvar1": [],
@@ -74,15 +72,13 @@ def train(
             labels = labels.to(device)
 
             optimizer.zero_grad()
-            reconstruction, z1, z2, mu1, mu2, logvar1, logvar2 = model(inputs)
+            reconstruction, _, _, mu1, mu2, logvar1, logvar2 = model(inputs)
             loss = criterion(reconstruction, inputs, mu1, logvar1, mu2, logvar2)
             loss.backward()
             optimizer.step()
 
             running_loss += loss.item()
 
-            history["z1"].append(z1.detach().cpu())
-            history["z2"].append(z2.detach().cpu())
             history["mu1"].append(mu1.detach().cpu())
             history["mu2"].append(mu2.detach().cpu())
             history["logvar1"].append(logvar1.detach().cpu())
