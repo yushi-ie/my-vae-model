@@ -55,6 +55,14 @@ def select_device(device_override: Optional[str]) -> torch.device:
         return torch.device(device_override)
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+features = {}
+
+def save_hook(name):
+    def hook(module, input, output):
+        features[name] = output.detach()
+    return hook
+
+
 
 def main() -> None:
     args = parse_args()
